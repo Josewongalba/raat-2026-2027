@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Administración de sesiones RAAT 2026-2027</title>
+<style>
+:root{--navy:#083e68;--blue:#0c79bd;--sky:#edf7fd;--line:#cbdbea;--text:#12263a;--muted:#62778c;--green:#087353;--greenbg:#d9f5e9;--amber:#8a5a00;--amberbg:#fff0c7;--red:#a62b2b;--redbg:#fde1e1;--white:#fff}
+*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:#edf3f8;color:var(--text)}
+header{background:linear-gradient(135deg,#083e68,#0c79bd);color:#fff;padding:18px 24px}header h1{margin:0;font-size:25px}header p{margin:4px 0 0;opacity:.9;font-size:13px}
+.app{max-width:1500px;margin:14px auto;padding:0 14px;display:grid;grid-template-columns:390px 1fr;gap:14px}.card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 22px #0c3d6310;padding:18px}.card h2{margin:0 0 14px;color:var(--navy);font-size:22px}
+.mode{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:9px 11px;border-radius:10px;background:var(--amberbg);color:var(--amber);font-size:12px;font-weight:700}.mode.connected{background:var(--greenbg);color:var(--green)}
+label{display:block;font-size:13px;font-weight:750;color:#244662;margin:10px 0 5px}input,select{width:100%;border:1px solid #bfd1e0;border-radius:10px;padding:10px 11px;font:inherit;background:#fff;color:var(--text);outline:none}input:focus,select:focus{border-color:#55aee2;box-shadow:0 0 0 3px #55aee224}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.row.three{grid-template-columns:1fr 1fr 1fr}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}button{border:0;border-radius:10px;padding:11px 13px;font-weight:800;cursor:pointer;background:var(--navy);color:#fff}button.secondary{background:#e6f0f7;color:var(--navy)}button.danger{background:var(--redbg);color:var(--red)}button:disabled{opacity:.45;cursor:not-allowed}.msg{display:none;margin-top:12px;padding:10px 12px;border-radius:10px;font-size:13px}.msg.ok{display:block;background:var(--greenbg);color:var(--green)}.msg.err{display:block;background:var(--redbg);color:var(--red)}
+.toolbar{display:grid;grid-template-columns:1fr 180px 150px;gap:9px;margin-bottom:12px}.summary{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.chip{background:#edf5fa;color:var(--navy);border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px;max-height:650px}table{width:100%;border-collapse:collapse;min-width:900px}th{position:sticky;top:0;z-index:1;background:#eff6fb;color:#173e5d;text-align:left;font-size:12px;padding:10px;border-bottom:1px solid var(--line)}td{padding:10px;border-bottom:1px solid #e8eef3;font-size:13px;vertical-align:middle}tr:hover{background:#f8fbfd}tr.selected{background:#e8f5fd}.id{font-weight:900;color:var(--navy)}.status{display:inline-block;border-radius:999px;padding:5px 9px;font-weight:800;font-size:11px}.Programada{background:#e7eff7;color:#34536d}.Abierta{background:var(--greenbg);color:var(--green)}.Cerrada{background:var(--amberbg);color:var(--amber)}.Cancelada{background:var(--redbg);color:var(--red)}.mini{padding:6px 9px;border-radius:7px;font-size:11px}.empty{text-align:center;padding:38px;color:var(--muted)}.hint{font-size:11px;color:var(--muted);line-height:1.4;margin-top:7px}
+@media(max-width:980px){.app{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}.table-wrap{max-height:450px}}@media(max-width:520px){.row,.row.three,.actions{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1>Administración de sesiones RAAT 2026-2027</h1><p>Alta, consulta y actualización de sesiones del evento</p></header>
+<main class="app">
+<section class="card">
+  <h2 id="formTitle">Nueva sesión</h2>
+  <div class="mode" id="mode"><span id="modeText">Modo local</span><span>●</span></div>
+  <form id="sessionForm" novalidate>
+    <input type="hidden" id="itemId">
+    <label for="sessionId">ID Sesión</label><input id="sessionId" maxlength="3" placeholder="S09" required autocomplete="off">
+    <label for="name">Nombre Sesión</label><input id="name" maxlength="255" placeholder="SESIÓN 9" required>
+    <div class="row">
+      <div><label for="date">Fecha</label><input id="date" type="date" required></div>
+      <div><label for="room">Sala</label><input id="room" maxlength="80" placeholder="Ej. Sala 1" required></div>
+    </div>
+    <div class="row">
+      <div><label for="start">Hora inicio</label><input id="start" type="time" required></div>
+      <div><label for="end">Hora fin</label><input id="end" type="time" required></div>
+    </div>
+    <div class="row">
+      <div><label for="status">Estado</label><select id="status"><option>Programada</option><option>Abierta</option><option>Cerrada</option><option>Cancelada</option></select></div>
+      <div><label for="order">Orden</label><input id="order" type="number" min="1" step="1" required></div>
+    </div>
+    <div class="actions"><button type="submit" id="save">Guardar sesión</button><button type="button" class="secondary" id="new">Nueva sesión</button><button type="button" class="danger" id="delete" disabled>Eliminar</button><button type="button" class="secondary" id="export">Exportar JSON</button></div>
+    <div class="msg" id="message"></div>
+    <p class="hint">Los datos se consultan y actualizan directamente en SharePoint mediante el flujo <b>RAAT_Gestionar_Sesiones</b>.</p>
+  </form>
+</section>
+<section class="card">
+  <h2>Sesiones registradas</h2>
+  <div class="summary" id="summary"></div>
+  <div class="toolbar"><input id="search" placeholder="Buscar por ID, nombre o sala"><select id="filterStatus"><option value="">Todos los estados</option><option>Programada</option><option>Abierta</option><option>Cerrada</option><option>Cancelada</option></select><select id="sort"><option value="order">Orden</option><option value="date">Fecha</option><option value="id">ID Sesión</option></select></div>
+  <div class="table-wrap"><table><thead><tr><th>Orden</th><th>ID</th><th>Nombre</th><th>Fecha</th><th>Horario</th><th>Sala</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="tbody"></tbody></table></div>
+</section>
+</main>
+<script>
+const FLOW_URL='https://defaultca8f09f5335e4fc58041f5b472a02e.ef.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/25/workflows/2c06810685374c278e0e810714de682e/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=kB1uYeILBXjv3RfFQgOJDhbGTLRYv_qFEWu9aJ6KPME';
+const STORAGE_KEY='raat_sesiones_admin_v3_vacio';
+const initial=[]
+const $=id=>document.getElementById(id);let sessions=[];
+function saveLocal(){localStorage.setItem(STORAGE_KEY,JSON.stringify(sessions))}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function fmtDate(v){if(!v)return'';const [y,m,d]=v.split('-');return`${d}/${m}/${y}`}
+function message(text,type='ok'){$('message').className='msg '+type;$('message').textContent=text;setTimeout(()=>{$('message').className='msg'},3500)}
+function resetForm(){['itemId','sessionId','name','date','start','end','room','order'].forEach(x=>$(x).value='');const max=sessions.reduce((m,x)=>Math.max(m,Number(String(x.id).replace(/\D/g,''))||0),0)+1;$('sessionId').value='S'+String(max).padStart(2,'0');$('name').value='SESIÓN '+max;$('order').value=max;$('status').value='Programada';$('formTitle').textContent='Nueva sesión';$('delete').disabled=true;document.querySelectorAll('tbody tr').forEach(x=>x.classList.remove('selected'));$('date').focus()}
+function fill(s){$('itemId').value=s.itemId||'';$('sessionId').value=s.id;$('name').value=s.name;$('date').value=s.date;$('start').value=s.start;$('end').value=s.end;$('room').value=s.room;$('status').value=s.status;$('order').value=s.order;$('formTitle').textContent='Editar '+s.id;$('delete').disabled=false;render(s.itemId)}
+function validate(d){if(!/^S\d{2}$/.test(d.id))return'El ID debe tener el formato S01, S02, etc.';const missing=[];if(!d.name)missing.push('Nombre');if(!d.date)missing.push('Fecha');if(!d.start)missing.push('Hora inicio');if(!d.end)missing.push('Hora fin');if(!d.room)missing.push('Sala');if(!d.order)missing.push('Orden');if(missing.length)return'Falta completar: '+missing.join(', ')+'.';if(d.end<=d.start)return'La hora fin debe ser posterior a la hora inicio.';const editing=Boolean(d.itemId)&&sessions.some(x=>x.itemId===d.itemId);if(!editing&&sessions.some(x=>x.id===d.id))return'Ya existe una sesión con el ID '+d.id+'.';return''}
+async function persist(action,data){if(!FLOW_URL)return{ok:true,local:true};const r=await fetch(FLOW_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({accion:action,sesion:data})});const t=await r.text();let j;try{j=JSON.parse(t)}catch(_){j={ok:r.ok,mensaje:t}};if(!r.ok||j.ok===false)throw Error(j.mensaje||'No fue posible completar la operación');return j}
+function onlyDate(v){return String(v||'').slice(0,10)}
+function onlyTime(v){const x=String(v||'');const m=x.match(/T(\d{2}:\d{2})/);return m?m[1]:x.slice(0,5)}
+function normalizeSession(x){return{itemId:String(x.itemId??''),id:String(x.id??''),name:String(x.name??''),date:onlyDate(x.date),start:onlyTime(x.start),end:onlyTime(x.end),room:String(x.room??''),status:String(x.status??'Programada'),order:Number(x.order)||0}}
+async function loadFromSharePoint(selected=''){if(!FLOW_URL)return;const previous=$('modeText').textContent;$('modeText').textContent='Consultando SharePoint...';try{const data=await persist('consultar',{});if(!Array.isArray(data))throw Error('La consulta no devolvió una lista de sesiones');sessions=data.map(normalizeSession);saveLocal();render(selected);$('modeText').textContent='Conectado a SharePoint';}catch(ex){$('modeText').textContent=previous||'Conectado a Power Automate';message('No fue posible consultar SharePoint: '+ex.message,'err')}}
+$('sessionForm').onsubmit=async e=>{e.preventDefault();const d={itemId:$('itemId').value,id:$('sessionId').value.trim().toUpperCase(),name:$('name').value.trim(),date:$('date').value,start:$('start').value,end:$('end').value,room:$('room').value.trim(),status:$('status').value,order:Number($('order').value)};const err=validate(d);if(err)return message(err,'err');$('save').disabled=true;try{const editing=Boolean(d.itemId)&&sessions.some(x=>x.itemId===d.itemId);await persist(editing?'editar':'crear',d);await loadFromSharePoint(d.itemId);const current=editing?sessions.find(x=>x.itemId===d.itemId):sessions.find(x=>x.id===d.id);if(current)fill(current);message(editing?'Sesión actualizada correctamente.':'Sesión creada correctamente.')}catch(ex){message(ex.message,'err')}finally{$('save').disabled=false}}
+$('delete').onclick=async()=>{const itemId=$('itemId').value;if(!itemId)return;const s=sessions.find(x=>x.itemId===itemId);if(!s||!confirm('¿Eliminar '+s.id+' - '+s.name+'?'))return;try{await persist('eliminar',s);await loadFromSharePoint();resetForm();message('Sesión eliminada.')}catch(ex){message(ex.message,'err')}}
+$('new').onclick=resetForm;$('search').oninput=()=>render();$('filterStatus').onchange=()=>render();$('sort').onchange=()=>render();
+$('sessionId').oninput=e=>e.target.value=e.target.value.toUpperCase().replace(/[^S0-9]/g,'').slice(0,3);
+$('export').onclick=()=>{const b=new Blob([JSON.stringify(sessions,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='sesiones_raat_2026_2027.json';a.click();URL.revokeObjectURL(a.href)};
+function render(selectedItemId=''){const q=$('search').value.trim().toLowerCase(),st=$('filterStatus').value,sort=$('sort').value;let data=sessions.filter(x=>(!q||[x.id,x.name,x.room].some(v=>String(v).toLowerCase().includes(q)))&&(!st||x.status===st));data.sort((a,b)=>sort==='date'?(a.date+a.start).localeCompare(b.date+b.start):sort==='id'?a.id.localeCompare(b.id):a.order-b.order);$('tbody').innerHTML=data.length?data.map(s=>`<tr class="${selectedItemId===s.itemId?'selected':''}"><td>${s.order}</td><td class="id">${esc(s.id)}</td><td>${esc(s.name)}</td><td>${fmtDate(s.date)}</td><td>${esc(s.start)}–${esc(s.end)}</td><td>${esc(s.room)}</td><td><span class="status ${esc(s.status)}">${esc(s.status)}</span></td><td><button class="mini" data-item-id="${esc(s.itemId)}">Editar</button></td></tr>`).join(''):'<tr><td colspan="8" class="empty">No hay sesiones que coincidan con los filtros.</td></tr>';$('tbody').querySelectorAll('button').forEach(b=>b.onclick=()=>{const sesion=sessions.find(x=>x.itemId===b.dataset.itemId);if(sesion)fill(sesion)});const counts=['Programada','Abierta','Cerrada','Cancelada'].map(x=>`${x}: ${sessions.filter(s=>s.status===x).length}`);$('summary').innerHTML=`<span class="chip">Total: ${sessions.length}</span>`+counts.map(x=>`<span class="chip">${x}</span>`).join('')}
+$('mode').classList.toggle('connected',!!FLOW_URL);$('modeText').textContent=FLOW_URL?'Conectando con SharePoint...':'Modo local · pendiente conectar flujo';render();resetForm();loadFromSharePoint();
+</script>
+</body></html>
